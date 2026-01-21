@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "188932847376",
+    "project_id": "pension-verification-ffc1d",
+    "storage_bucket": "pension-verification-ffc1d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:188932847376:android:502366c1fbcec46f7d5795",
+        "android_client_info": {
+          "package_name": "com.example.pension_verification_application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA0l4E_M4S_csYv-kUWuh0ZGsK2Cn7JTyw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
