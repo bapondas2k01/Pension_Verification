@@ -1,8 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Camera Permission -->
     <uses-permission android:name="android.permission.CAMERA"/>
+    <!-- For saving photos to storage (Android 12 and below) -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32"/>
+    <!-- Camera hardware features -->
     <uses-feature android:name="android.hardware.camera" android:required="true"/>
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false"/>
+    <!-- For Android 13+ (API 33+), add photo picker permission if needed -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
     
     <application
         android:label="pension_verification_application"

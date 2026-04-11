@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers/language_provider.dart';
 import '../../utils/app_theme.dart';
+import '../admin/admin_login_screen.dart';
 import 'login_step2_screen.dart';
 import 'nid_scanner_screen.dart';
 
@@ -30,7 +31,7 @@ class _LoginStep1ScreenState extends State<LoginStep1Screen> {
           content: Text(
             _is17Digit
                 ? 'Please enter 17 digit NID'
-                : 'Please enter 10 digit NID',
+                : 'Please enter 10 digit EPPO number',
           ),
         ),
       );
@@ -45,7 +46,7 @@ class _LoginStep1ScreenState extends State<LoginStep1Screen> {
           content: Text(
             _is17Digit
                 ? 'NID must be exactly 17 digits'
-                : 'NID must be exactly 10 digits',
+                : 'EPPO number must be exactly 10 digits',
           ),
         ),
       );
@@ -54,7 +55,12 @@ class _LoginStep1ScreenState extends State<LoginStep1Screen> {
 
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const LoginStep2Screen()),
+      MaterialPageRoute(
+        builder: (context) => LoginStep2Screen(
+          nidOrEppo: _nidController.text,
+          is17Digit: _is17Digit,
+        ),
+      ),
     );
   }
 
@@ -358,6 +364,30 @@ class _LoginStep1ScreenState extends State<LoginStep1Screen> {
                             const SizedBox(width: 8),
                             const Icon(Icons.arrow_forward),
                           ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Admin Login button
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const AdminLoginScreen(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.security_rounded),
+                        label: const Text('Admin Panel'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
                         ),
                       ),
                     ),

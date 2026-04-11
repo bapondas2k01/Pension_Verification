@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'l10n/app_localizations.dart';
 import 'providers/language_provider.dart';
 import 'providers/pensioner_provider.dart';
+import 'providers/admin_provider.dart';
 import 'utils/app_theme.dart';
 import 'screens/login/login_step1_screen.dart';
 
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => LanguageProvider()),
         ChangeNotifierProvider(create: (_) => PensionerProvider()),
+        ChangeNotifierProvider(create: (_) => AdminProvider()),
       ],
       child: Consumer<LanguageProvider>(
         builder: (context, languageProvider, child) {

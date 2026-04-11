@@ -26,35 +26,127 @@ class PensionerProvider extends ChangeNotifier {
   DateTime? get lastVerificationDate => _lastVerificationDate;
   bool get isVerified => _isVerified;
 
-  /// Login using NID and EPPONumber only
-  Future<bool> loginWithNidAndEppo(String nid, String eppoNumber) async {
+  /// Step 1: Validate NID/EPPO and check if pensioner exists
+  Future<bool> validateNidOrEppo(
+    String value, {
+    required bool is17Digit,
+  }) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      final pensionerData = await SupabaseService.getPensionerByNidAndEppo(
-        nid,
-        eppoNumber,
-      );
+      Map<String, dynamic>? pensionerData;
+
+      if (is17Digit) {
+        // Search by 17-digit NID
+        pensionerData = await SupabaseService.getPensionerByNid(value);
+      } else {
+        // Search by 10-digit EPPO
+        pensionerData = await SupabaseService.getPensionerByEppo(value);
+      }
+
       _isLoading = false;
+
+      if (pensionerData != null) {
+        // Store temporarily - will complete login after PIN verification
+        _currentPensioner = Pensioner.fromFirestore(
+          pensionerData,
+          pensionerData['id'],
+        );
+        notifyListeners();
+        return true;
+      } else {
+        _error = is17Digit
+            ? 'No pensioner found with this NID'
+            : 'No pensioner found with this EPPO number';
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _error = 'Error validating: $e';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Step 2: Verify PIN and complete login
+  Future<bool> verifyPinAndLogin(String pin) async {
+    if (_currentPensioner == null) {
+      _error = 'No pensioner data found. Please restart login.';
+      notifyListeners();
+      return false;
+    }
+
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final isValid = await SupabaseService.verifyPensionerPin(
+        _currentPensioner!.id,
+        pin,
+      );
+
+      if (isValid) {
+        // Load verification history from Supabase
+        await _loadVerificationHistory();
+        // Load mock payment and fixation data (can be replaced with Supabase later)
+        _loadMockPaymentData();
+
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _error = 'Invalid PIN. Please try again.';
+        _isLoading = false;
+        notifyListeners();
+        return false;
+      }
+    } catch (e) {
+      _error = 'Login failed: $e';
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Legacy method for backward compatibility
+  Future<bool> loginWithNid(String nid, {bool is17Digit = false}) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      Map<String, dynamic>? pensionerData;
+
+      if (is17Digit) {
+        pensionerData = await SupabaseService.getPensionerByNid(nid);
+      } else {
+        pensionerData = await SupabaseService.getPensionerByEppo(nid);
+      }
 
       if (pensionerData != null) {
         _currentPensioner = Pensioner.fromFirestore(
           pensionerData,
           pensionerData['id'],
         );
+
         await _loadVerificationHistory();
         _loadMockPaymentData();
+
+        _isLoading = false;
         notifyListeners();
         return true;
       } else {
-        _error = 'No pensioner found with this NID and EPPO number';
+        _error = 'Pensioner not found';
+        _isLoading = false;
         notifyListeners();
         return false;
       }
     } catch (e) {
-      _error = 'Login failed: $e';
+      _error = e.toString();
       _isLoading = false;
       notifyListeners();
       return false;
@@ -181,7 +273,7 @@ class PensionerProvider extends ChangeNotifier {
         _isVerified = true;
 
         // Update pensioner's last verification date in Supabase
-        await SupabaseService.updatePensionerAuto(_currentPensioner!.nid, {
+        await SupabaseService.updatePensioner(_currentPensioner!.id, {
           'lastVerificationDate': DateTime.now(),
         });
 

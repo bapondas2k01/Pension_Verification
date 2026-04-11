@@ -2,67 +2,58 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
 
 class SupabaseService {
-  /// Update pensioner in the correct table based on NID length
-  static Future<bool> updatePensionerAuto(
-    String nid,
-    Map<String, dynamic> data,
-  ) async {
-    String table;
-    if (nid.length == 10) {
-      table = 'pensioners_nid10';
-    } else if (nid.length == 17) {
-      table = 'pensioners_nid17';
-    } else {
-      return false;
-    }
-    final response = await client.from(table).update(data).eq('nid', nid);
-    return response != null;
-  }
-
-  /// Returns pensioner from the correct table based on NID length (10 or 17 digits)
-  static Future<Map<String, dynamic>?> getPensionerByNidAuto(String nid) async {
-    String table;
-    if (nid.length == 10) {
-      table = 'pensioners_nid10';
-    } else if (nid.length == 17) {
-      table = 'pensioners_nid17';
-    } else {
-      return null; // Invalid NID length
-    }
-    final response = await client
-        .from(table)
-        .select()
-        .eq('nid', nid)
-        .limit(1)
-        .single();
-    return response;
-  }
-
   static final SupabaseClient client = Supabase.instance.client;
 
   // ==================== PENSIONER OPERATIONS ====================
 
-  /// Get pensioner by NID and EPPO number (for login/verification)
-  static Future<Map<String, dynamic>?> getPensionerByNidAndEppo(
-    String nid,
-    String eppoNumber,
-  ) async {
-    String table;
-    if (nid.length == 10) {
-      table = 'pensioners_nid10';
-    } else if (nid.length == 17) {
-      table = 'pensioners_nid17';
-    } else {
-      return null; // Invalid NID length
-    }
+  static Future<Map<String, dynamic>?> getPensionerByNid(String nid) async {
     final response = await client
-        .from(table)
+        .from('pensioners')
         .select()
         .eq('nid', nid)
-        .eq('eppoNumber', eppoNumber)
         .limit(1)
         .single();
     return response;
+  }
+
+  static Future<Map<String, dynamic>?> getPensionerByEppo(String eppo) async {
+    final response = await client
+        .from('pensioners')
+        .select()
+        .eq('eppoNumber', eppo)
+        .limit(1)
+        .single();
+    return response;
+  }
+
+  static Future<Map<String, dynamic>?> getPensionerById(String id) async {
+    final response = await client
+        .from('pensioners')
+        .select()
+        .eq('id', id)
+        .limit(1)
+        .single();
+    return response;
+  }
+
+  static Future<bool> verifyPensionerPin(String pensionerId, String pin) async {
+    final response = await client
+        .from('pensioners')
+        .select('pin')
+        .eq('id', pensionerId)
+        .single();
+    return response != null && response['pin'] == pin;
+  }
+
+  static Future<bool> updatePensioner(
+    String pensionerId,
+    Map<String, dynamic> data,
+  ) async {
+    final response = await client
+        .from('pensioners')
+        .update(data)
+        .eq('id', pensionerId);
+    return response != null;
   }
 
   // ==================== VERIFICATION OPERATIONS ====================

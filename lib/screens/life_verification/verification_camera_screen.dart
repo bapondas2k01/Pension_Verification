@@ -19,6 +19,21 @@ class VerificationCameraScreen extends StatefulWidget {
 }
 
 class _VerificationCameraScreenState extends State<VerificationCameraScreen> {
+  // Manual capture method
+  Future<void> _manualCapture() async {
+    if (_isProcessing || _cameraController == null) return;
+    setState(() => _isProcessing = true);
+    try {
+      final image = await _cameraController!.takePicture();
+      _capturedPhotoPath = image.path;
+      // Optionally, you can add logic to proceed to the next step or process the image
+      setState(() {});
+    } catch (e) {
+      debugPrint('Manual capture error: $e');
+    }
+    setState(() => _isProcessing = false);
+  }
+
   int _currentStep = 0;
   bool _isProcessing = false;
   bool _verificationComplete = false;
@@ -119,65 +134,14 @@ class _VerificationCameraScreenState extends State<VerificationCameraScreen> {
     super.dispose();
   }
 
+  // Auto-capture disabled: no-op
   void _startFaceDetection() {
-    _detectionTimer = Timer.periodic(const Duration(milliseconds: 500), (_) {
-      if (!_isProcessing &&
-          _cameraController != null &&
-          _cameraController!.value.isInitialized &&
-          !_verificationComplete) {
-        _detectAndCapture();
-      }
-    });
+    // Do nothing, manual only
   }
 
+  // Auto-capture disabled: no-op
   Future<void> _detectAndCapture() async {
-    if (_isProcessing || _cameraController == null) return;
-
-    setState(() => _isProcessing = true);
-
-    try {
-      final image = await _cameraController!.takePicture();
-      final inputImage = InputImage.fromFilePath(image.path);
-      final faces = await _faceDetector.processImage(inputImage);
-
-      if (faces.isEmpty) {
-        // No face detected - reset criteria match counter
-        setState(() {
-          _faceMatchesCriteria = false;
-          _criteriaMatchCount = 0;
-        });
-      } else {
-        final face = faces.first;
-        final bool matchesCriteria = _checkFaceCriteria(face);
-
-        if (matchesCriteria) {
-          _criteriaMatchCount++;
-
-          if (_criteriaMatchCount >= _requiredMatchCount) {
-            // Face matches criteria for required number of times - auto capture!
-            // Save the first captured photo (when looking straight)
-            if (_currentStep == 0 && _capturedPhotoPath == null) {
-              _capturedPhotoPath = image.path;
-            }
-            setState(() => _faceMatchesCriteria = true);
-            await Future.delayed(const Duration(milliseconds: 300));
-            _nextStep();
-            return; // Don't reset processing flag yet
-          }
-        } else {
-          // Face doesn't match criteria - reset counter
-          setState(() {
-            _faceMatchesCriteria = false;
-            _criteriaMatchCount = 0;
-          });
-        }
-      }
-    } catch (e) {
-      // Error in detection - continue trying
-      debugPrint('Face detection error: $e');
-    }
-
-    setState(() => _isProcessing = false);
+    // Do nothing, manual only
   }
 
   bool _checkFaceCriteria(Face face) {
@@ -560,7 +524,7 @@ class _VerificationCameraScreenState extends State<VerificationCameraScreen> {
         // Auto-capture status indicator
         if (_isProcessing)
           Positioned(
-            bottom: 40,
+            bottom: 100,
             left: 0,
             right: 0,
             child: Center(
@@ -590,6 +554,25 @@ class _VerificationCameraScreenState extends State<VerificationCameraScreen> {
                       ),
                     ),
                   ],
+                ),
+              ),
+            ),
+          ),
+
+        // Manual capture button
+        if (_isCameraInitialized && !_isProcessing && !_verificationComplete)
+          Positioned(
+            bottom: 30,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: FloatingActionButton(
+                backgroundColor: AppTheme.primaryGreen,
+                onPressed: _manualCapture,
+                child: const Icon(
+                  Icons.camera_alt,
+                  size: 32,
+                  color: Colors.white,
                 ),
               ),
             ),
