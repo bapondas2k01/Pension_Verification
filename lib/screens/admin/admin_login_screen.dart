@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../utils/app_theme.dart';
+import '../../providers/admin_provider.dart';
+import '../../models/admin.dart';
 import 'admin_dashboard_screen.dart';
 
 class AdminLoginScreen extends StatefulWidget {
@@ -12,13 +15,21 @@ class AdminLoginScreen extends StatefulWidget {
 class _AdminLoginScreenState extends State<AdminLoginScreen> {
   final TextEditingController _adminIdController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  late FocusNode _passwordFocusNode;
   bool _obscurePassword = true;
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _passwordFocusNode = FocusNode();
+  }
 
   @override
   void dispose() {
     _adminIdController.dispose();
     _passwordController.dispose();
+    _passwordFocusNode.dispose();
     super.dispose();
   }
 
@@ -46,12 +57,28 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     if (!mounted) return;
 
     if (_validateCredentials(adminId, password)) {
-      // Login successful
+      // Login successful - create admin object and set in provider
+      final admin = Admin(
+        id: adminId,
+        name: adminId == 'admin001' ? 'Admin One' : 'Administrator',
+        email: '$adminId@pension.gov',
+        role: 'admin',
+        accountingOffice: 'Main Office',
+        isActive: true,
+        createdAt: DateTime.now(),
+        lastLogin: DateTime.now(),
+      );
+
+      // ignore: use_build_context_synchronously
+      await context.read<AdminProvider>().setCurrentAdmin(admin);
+
+      if (!mounted) return;
+
       // ignore: use_build_context_synchronously
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => AdminDashboardScreen(adminId: adminId),
+          builder: (context) => const AdminDashboardScreen(),
         ),
       );
     } else {
@@ -62,10 +89,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
 
   void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppTheme.accentRed,
-      ),
+      SnackBar(content: Text(message), backgroundColor: AppTheme.accentRed),
     );
   }
 
@@ -84,10 +108,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                 children: [
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                    ),
+                    child: const Icon(Icons.arrow_back, color: Colors.white),
                   ),
                   const SizedBox(width: 16),
                   const Text(
@@ -173,6 +194,9 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                         ),
                       ),
                       enabled: !_isLoading,
+                      onSubmitted: (_) {
+                        _passwordFocusNode.requestFocus();
+                      },
                     ),
 
                     const SizedBox(height: 20),
@@ -191,13 +215,16 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                     // Password Input
                     TextField(
                       controller: _passwordController,
+                      focusNode: _passwordFocusNode,
                       obscureText: _obscurePassword,
                       decoration: InputDecoration(
                         hintText: 'Enter your password',
                         prefixIcon: const Icon(Icons.lock_outline),
                         suffixIcon: GestureDetector(
                           onTap: () {
-                            setState(() => _obscurePassword = !_obscurePassword);
+                            setState(
+                              () => _obscurePassword = !_obscurePassword,
+                            );
                           },
                           child: Icon(
                             _obscurePassword
@@ -210,6 +237,11 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                         ),
                       ),
                       enabled: !_isLoading,
+                      onSubmitted: (_) {
+                        if (!_isLoading) {
+                          _handleLogin();
+                        }
+                      },
                     ),
 
                     const SizedBox(height: 30),
@@ -251,9 +283,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                       decoration: BoxDecoration(
                         color: Colors.blue.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: Colors.blue.withOpacity(0.3),
-                        ),
+                        border: Border.all(color: Colors.blue.withOpacity(0.3)),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

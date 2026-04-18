@@ -5,11 +5,10 @@ import '../../utils/app_theme.dart';
 import 'verification_requests_screen.dart';
 import 'pensioners_list_screen.dart';
 import 'verification_statistics_screen.dart';
+import 'verification_detail_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
-  final String? adminId;
-
-  const AdminDashboardScreen({super.key, this.adminId});
+  const AdminDashboardScreen({super.key});
 
   @override
   State<AdminDashboardScreen> createState() => _AdminDashboardScreenState();
@@ -35,22 +34,86 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     });
   }
 
+  void _logout() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Logout'),
+          content: const Text('Are you sure you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/',
+                  (Route<dynamic> route) => false,
+                );
+              },
+              child: const Text(
+                'Logout',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _navigateToTab(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Admin Panel'),
         elevation: 0,
+        backgroundColor: AppTheme.primaryGreen,
         actions: [
           Consumer<AdminProvider>(
-            builder: (context, adminProvider, _) {
+            builder: (context, adminProvider, child) {
               return Padding(
-                padding: const EdgeInsets.all(16),
-                child: Center(
-                  child: Text(
-                    adminProvider.currentAdmin?.name ?? 'Admin',
-                    style: const TextStyle(color: Colors.white),
-                  ),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Center(
+                      child: Text(
+                        adminProvider.currentAdmin?.name ?? 'Admin',
+                        style: const TextStyle(color: Colors.white, fontSize: 14),
+                      ),
+                    ),
+                    PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert, color: Colors.white),
+                      onSelected: (String value) {
+                        if (value == 'logout') {
+                          _logout();
+                        }
+                      },
+                      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                        const PopupMenuItem<String>(
+                          value: 'logout',
+                          child: Row(
+                            children: [
+                              Icon(Icons.logout, color: Colors.red, size: 20),
+                              SizedBox(width: 8),
+                              Text('Logout'),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               );
             },
@@ -219,21 +282,34 @@ class AdminHomeScreen extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      // Navigate to pending verifications
-                      // This can be done through parent widget
+                      if (context.mounted) {
+                        final dashboardState = context.findAncestorStateOfType<_AdminDashboardScreenState>();
+                        dashboardState?._navigateToTab(1);
+                      }
                     },
                     icon: const Icon(Icons.assignment_turned_in),
                     label: const Text('Review Requests'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryGreen,
+                      foregroundColor: Colors.white,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      // Navigate to pensioners
+                      if (context.mounted) {
+                        final dashboardState = context.findAncestorStateOfType<_AdminDashboardScreenState>();
+                        dashboardState?._navigateToTab(2);
+                      }
                     },
                     icon: const Icon(Icons.person_add),
                     label: const Text('View Pensioners'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryGreen,
+                      foregroundColor: Colors.white,
+                    ),
                   ),
                 ),
               ],
@@ -263,7 +339,10 @@ class AdminHomeScreen extends StatelessWidget {
                   subtitle: 'Review & approve',
                   color: Colors.blue,
                   onTap: () {
-                    // Navigate to verification requests
+                    if (context.mounted) {
+                      final dashboardState = context.findAncestorStateOfType<_AdminDashboardScreenState>();
+                      dashboardState?._navigateToTab(1);
+                    }
                   },
                 ),
                 _buildFeatureCard(
@@ -273,7 +352,10 @@ class AdminHomeScreen extends StatelessWidget {
                   subtitle: 'Browse records',
                   color: Colors.purple,
                   onTap: () {
-                    // Navigate to pensioners
+                    if (context.mounted) {
+                      final dashboardState = context.findAncestorStateOfType<_AdminDashboardScreenState>();
+                      dashboardState?._navigateToTab(2);
+                    }
                   },
                 ),
                 _buildFeatureCard(
@@ -283,7 +365,10 @@ class AdminHomeScreen extends StatelessWidget {
                   subtitle: 'View reports',
                   color: Colors.teal,
                   onTap: () {
-                    // Navigate to statistics
+                    if (context.mounted) {
+                      final dashboardState = context.findAncestorStateOfType<_AdminDashboardScreenState>();
+                      dashboardState?._navigateToTab(3);
+                    }
                   },
                 ),
                 _buildFeatureCard(
@@ -293,7 +378,10 @@ class AdminHomeScreen extends StatelessWidget {
                   subtitle: 'Track changes',
                   color: Colors.orange,
                   onTap: () {
-                    // Navigate to history
+                    if (context.mounted) {
+                      final dashboardState = context.findAncestorStateOfType<_AdminDashboardScreenState>();
+                      dashboardState?._navigateToTab(1);
+                    }
                   },
                 ),
               ],
@@ -319,9 +407,7 @@ class AdminHomeScreen extends StatelessWidget {
                   );
                 }
 
-                final verifications = adminProvider.pendingVerifications.take(
-                  5,
-                );
+                final verifications = adminProvider.pendingVerifications.take(5);
                 return ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -332,7 +418,14 @@ class AdminHomeScreen extends StatelessWidget {
                       context,
                       verification: verification,
                       onTap: () {
-                        // Navigate to verification details
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => VerificationDetailScreen(
+                              verification: verification,
+                            ),
+                          ),
+                        );
                       },
                     );
                   },
