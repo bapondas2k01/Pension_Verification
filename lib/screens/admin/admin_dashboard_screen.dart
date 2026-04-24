@@ -6,10 +6,7 @@ import 'verification_requests_screen.dart';
 import 'pensioners_list_screen.dart';
 import 'verification_statistics_screen.dart';
 import 'verification_detail_screen.dart';
-<<<<<<< Updated upstream
 import 'admin_management_screen.dart';
-=======
->>>>>>> Stashed changes
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -26,10 +23,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     VerificationRequestsScreen(),
     PensionersListScreen(),
     VerificationStatisticsScreen(),
-<<<<<<< Updated upstream
     AdminManagementScreen(),
-=======
->>>>>>> Stashed changes
   ];
 
   @override
@@ -63,14 +57,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   (Route<dynamic> route) => false,
                 );
               },
-<<<<<<< Updated upstream
               child: const Text('Logout', style: TextStyle(color: Colors.red)),
-=======
-              child: const Text(
-                'Logout',
-                style: TextStyle(color: Colors.red),
-              ),
->>>>>>> Stashed changes
             ),
           ],
         );
@@ -102,14 +89,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     Center(
                       child: Text(
                         adminProvider.currentAdmin?.name ?? 'Admin',
-<<<<<<< Updated upstream
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 14,
                         ),
-=======
-                        style: const TextStyle(color: Colors.white, fontSize: 14),
->>>>>>> Stashed changes
                       ),
                     ),
                     PopupMenuButton<String>(
@@ -119,7 +102,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                           _logout();
                         }
                       },
-<<<<<<< Updated upstream
                       itemBuilder: (BuildContext context) =>
                           <PopupMenuEntry<String>>[
                             const PopupMenuItem<String>(
@@ -137,20 +119,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                               ),
                             ),
                           ],
-=======
-                      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                        const PopupMenuItem<String>(
-                          value: 'logout',
-                          child: Row(
-                            children: [
-                              Icon(Icons.logout, color: Colors.red, size: 20),
-                              SizedBox(width: 8),
-                              Text('Logout'),
-                            ],
-                          ),
-                        ),
-                      ],
->>>>>>> Stashed changes
                     ),
                   ],
                 ),
@@ -188,13 +156,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             icon: Icon(Icons.bar_chart),
             label: 'Statistics',
           ),
-<<<<<<< Updated upstream
           BottomNavigationBarItem(
             icon: Icon(Icons.admin_panel_settings),
             label: 'Admin',
           ),
-=======
->>>>>>> Stashed changes
         ],
       ),
     );
@@ -329,14 +294,10 @@ class AdminHomeScreen extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: () {
                       if (context.mounted) {
-<<<<<<< Updated upstream
                         final dashboardState = context
                             .findAncestorStateOfType<
                               _AdminDashboardScreenState
                             >();
-=======
-                        final dashboardState = context.findAncestorStateOfType<_AdminDashboardScreenState>();
->>>>>>> Stashed changes
                         dashboardState?._navigateToTab(1);
                       }
                     },
@@ -353,14 +314,10 @@ class AdminHomeScreen extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: () {
                       if (context.mounted) {
-<<<<<<< Updated upstream
                         final dashboardState = context
                             .findAncestorStateOfType<
                               _AdminDashboardScreenState
                             >();
-=======
-                        final dashboardState = context.findAncestorStateOfType<_AdminDashboardScreenState>();
->>>>>>> Stashed changes
                         dashboardState?._navigateToTab(2);
                       }
                     },
@@ -400,14 +357,10 @@ class AdminHomeScreen extends StatelessWidget {
                   color: Colors.blue,
                   onTap: () {
                     if (context.mounted) {
-<<<<<<< Updated upstream
                       final dashboardState = context
                           .findAncestorStateOfType<
                             _AdminDashboardScreenState
                           >();
-=======
-                      final dashboardState = context.findAncestorStateOfType<_AdminDashboardScreenState>();
->>>>>>> Stashed changes
                       dashboardState?._navigateToTab(1);
                     }
                   },
@@ -420,14 +373,10 @@ class AdminHomeScreen extends StatelessWidget {
                   color: Colors.purple,
                   onTap: () {
                     if (context.mounted) {
-<<<<<<< Updated upstream
                       final dashboardState = context
                           .findAncestorStateOfType<
                             _AdminDashboardScreenState
                           >();
-=======
-                      final dashboardState = context.findAncestorStateOfType<_AdminDashboardScreenState>();
->>>>>>> Stashed changes
                       dashboardState?._navigateToTab(2);
                     }
                   },
@@ -440,14 +389,10 @@ class AdminHomeScreen extends StatelessWidget {
                   color: Colors.teal,
                   onTap: () {
                     if (context.mounted) {
-<<<<<<< Updated upstream
                       final dashboardState = context
                           .findAncestorStateOfType<
                             _AdminDashboardScreenState
                           >();
-=======
-                      final dashboardState = context.findAncestorStateOfType<_AdminDashboardScreenState>();
->>>>>>> Stashed changes
                       dashboardState?._navigateToTab(3);
                     }
                   },
@@ -460,14 +405,10 @@ class AdminHomeScreen extends StatelessWidget {
                   color: Colors.orange,
                   onTap: () {
                     if (context.mounted) {
-<<<<<<< Updated upstream
                       final dashboardState = context
                           .findAncestorStateOfType<
                             _AdminDashboardScreenState
                           >();
-=======
-                      final dashboardState = context.findAncestorStateOfType<_AdminDashboardScreenState>();
->>>>>>> Stashed changes
                       dashboardState?._navigateToTab(1);
                     }
                   },
@@ -495,13 +436,9 @@ class AdminHomeScreen extends StatelessWidget {
                   );
                 }
 
-<<<<<<< Updated upstream
                 final verifications = adminProvider.pendingVerifications.take(
                   5,
                 );
-=======
-                final verifications = adminProvider.pendingVerifications.take(5);
->>>>>>> Stashed changes
                 return ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),

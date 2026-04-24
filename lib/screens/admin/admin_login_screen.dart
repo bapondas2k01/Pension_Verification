@@ -1,17 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../utils/app_theme.dart';
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
 import '../../providers/admin_provider.dart';
 import '../../models/admin.dart';
 import '../../services/admin_service.dart';
->>>>>>> Stashed changes
-=======
-import '../../providers/admin_provider.dart';
-import '../../models/admin.dart';
->>>>>>> Stashed changes
 import 'admin_dashboard_screen.dart';
 
 class AdminLoginScreen extends StatefulWidget {
@@ -59,39 +51,6 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
 
     setState(() => _isLoading = true);
 
-<<<<<<< Updated upstream
-    // Simulate network delay
-    await Future.delayed(const Duration(seconds: 1));
-
-    if (!mounted) return;
-
-    if (_validateCredentials(adminId, password)) {
-      // Login successful - create admin object and set in provider
-      final admin = Admin(
-        id: adminId,
-        name: adminId == 'admin001' ? 'Admin One' : 'Administrator',
-        email: '$adminId@pension.gov',
-        role: 'admin',
-        accountingOffice: 'Main Office',
-        isActive: true,
-        createdAt: DateTime.now(),
-        lastLogin: DateTime.now(),
-      );
-
-      // ignore: use_build_context_synchronously
-      await context.read<AdminProvider>().setCurrentAdmin(admin);
-
-      if (!mounted) return;
-
-      // ignore: use_build_context_synchronously
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const AdminDashboardScreen(),
-        ),
-      );
-    } else {
-=======
     try {
       // Authenticate against Supabase database with strict validation
       final admin = await AdminService.authenticateAdminByEmail(
@@ -122,7 +81,6 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
         _showError(errorMessage);
       }
     } catch (e) {
->>>>>>> Stashed changes
       setState(() => _isLoading = false);
       _showError('Login failed: ${e.toString()}');
     }
@@ -325,17 +283,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                       decoration: BoxDecoration(
                         color: Colors.green.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-                        border: Border.all(
-                          color: Colors.blue.withOpacity(0.3),
-                        ),
-=======
                         border: Border.all(color: Colors.green.withOpacity(0.3)),
->>>>>>> Stashed changes
-=======
-                        border: Border.all(color: Colors.blue.withOpacity(0.3)),
->>>>>>> Stashed changes
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
