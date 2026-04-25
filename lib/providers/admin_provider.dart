@@ -8,6 +8,7 @@ class AdminProvider extends ChangeNotifier {
   List<VerificationRequest> _pendingVerifications = [];
   List<VerificationRequest> _allVerifications = [];
   List<Map<String, dynamic>> _pensioners = [];
+  List<Admin> _admins = [];
   Map<String, dynamic> _dashboardStats = {};
   bool _isLoading = false;
   String? _error;
@@ -19,6 +20,7 @@ class AdminProvider extends ChangeNotifier {
   List<VerificationRequest> get pendingVerifications => _pendingVerifications;
   List<VerificationRequest> get allVerifications => _allVerifications;
   List<Map<String, dynamic>> get pensioners => _pensioners;
+  List<Admin> get admins => _admins;
   Map<String, dynamic> get dashboardStats => _dashboardStats;
   bool get isLoading => _isLoading;
   String? get error => _error;
@@ -42,8 +44,7 @@ class AdminProvider extends ChangeNotifier {
 
     try {
       _pendingVerifications = await AdminService.getPendingVerifications(
-        accountingOffice:
-            accountingOffice ?? _currentAdmin?.accountingOffice,
+        accountingOffice: accountingOffice ?? _currentAdmin?.accountingOffice,
         limit: itemsPerPage,
         offset: _currentPage * itemsPerPage,
       );
@@ -97,8 +98,7 @@ class AdminProvider extends ChangeNotifier {
 
       if (success) {
         // Remove from pending list
-        _pendingVerifications
-            .removeWhere((v) => v.id == verificationId);
+        _pendingVerifications.removeWhere((v) => v.id == verificationId);
         await loadDashboardStats();
         notifyListeners();
       }
@@ -123,8 +123,7 @@ class AdminProvider extends ChangeNotifier {
       );
 
       if (success) {
-        _pendingVerifications
-            .removeWhere((v) => v.id == verificationId);
+        _pendingVerifications.removeWhere((v) => v.id == verificationId);
         await loadDashboardStats();
         notifyListeners();
       }
@@ -218,8 +217,9 @@ class AdminProvider extends ChangeNotifier {
     }
   }
 
-  Future<List<Map<String, dynamic>>>
-      getPensionerVerificationHistory(String pensionerId) async {
+  Future<List<Map<String, dynamic>>> getPensionerVerificationHistory(
+    String pensionerId,
+  ) async {
     try {
       return await AdminService.getPensionerVerificationHistory(
         pensionerId: pensionerId,
@@ -257,6 +257,183 @@ class AdminProvider extends ChangeNotifier {
     } catch (e) {
       _error = e.toString();
       return {};
+    }
+  }
+
+  // ==================== ADMIN MANAGEMENT ====================
+
+  Future<void> loadAllAdmins() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      _admins = await AdminService.getAllAdmins(
+        limit: itemsPerPage,
+        offset: _currentPage * itemsPerPage,
+      );
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> loadAdminsByOffice(String accountingOffice) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      _admins = await AdminService.getAdminsByOffice(
+        accountingOffice: accountingOffice,
+        limit: itemsPerPage,
+        offset: _currentPage * itemsPerPage,
+      );
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> createNewAdmin({
+    required String id,
+    required String name,
+    required String email,
+    required String password,
+    required String role,
+    required String accountingOffice,
+  }) async {
+    try {
+      final admin = await AdminService.createAdmin(
+        id: id,
+        name: name,
+        email: email,
+        password: password,
+        role: role,
+        accountingOffice: accountingOffice,
+      );
+
+      if (admin != null) {
+        _admins.add(admin);
+        notifyListeners();
+        return true;
+      }
+      return false;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> updateAdminDetails({
+    required String adminId,
+    String? name,
+    String? email,
+    String? role,
+    String? accountingOffice,
+    bool? isActive,
+  }) async {
+    try {
+      final success = await AdminService.updateAdmin(
+        adminId: adminId,
+        name: name,
+        email: email,
+        role: role,
+        accountingOffice: accountingOffice,
+        isActive: isActive,
+      );
+
+      if (success) {
+        // Update local list
+        final index = _admins.indexWhere((a) => a.id == adminId);
+        if (index != -1) {
+          final admin = _admins[index];
+          _admins[index] = Admin(
+            id: admin.id,
+            name: name ?? admin.name,
+            email: email ?? admin.email,
+            role: role ?? admin.role,
+            accountingOffice: accountingOffice ?? admin.accountingOffice,
+            isActive: isActive ?? admin.isActive,
+            createdAt: admin.createdAt,
+            lastLogin: admin.lastLogin,
+          );
+          notifyListeners();
+        }
+      }
+      return success;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> deactivateAdminUser(String adminId) async {
+    try {
+      final success = await AdminService.deactivateAdmin(adminId);
+      if (success) {
+        await loadAllAdmins();
+      }
+      return success;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> deleteAdminUser(String adminId) async {
+    try {
+      final success = await AdminService.deleteAdmin(adminId);
+      if (success) {
+        _admins.removeWhere((a) => a.id == adminId);
+        notifyListeners();
+      }
+      return success;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> changePassword({
+    required String adminId,
+    required String newPassword,
+  }) async {
+    try {
+      return await AdminService.changeAdminPassword(
+        adminId: adminId,
+        newPassword: newPassword,
+      );
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<void> searchAdmins(String query) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      _admins = await AdminService.searchAdmins(query: query);
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
     }
   }
 

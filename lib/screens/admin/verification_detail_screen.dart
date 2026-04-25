@@ -3,14 +3,12 @@ import 'package:provider/provider.dart';
 import '../../models/verification_request.dart';
 import '../../providers/admin_provider.dart';
 import '../../utils/app_theme.dart';
+import 'verification_review_form.dart';
 
 class VerificationDetailScreen extends StatefulWidget {
   final VerificationRequest verification;
 
-  const VerificationDetailScreen({
-    super.key,
-    required this.verification,
-  });
+  const VerificationDetailScreen({super.key, required this.verification});
 
   @override
   State<VerificationDetailScreen> createState() =>
@@ -36,10 +34,7 @@ class _VerificationDetailScreenState extends State<VerificationDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Verification Details'),
-        elevation: 0,
-      ),
+      appBar: AppBar(title: const Text('Verification Details'), elevation: 0),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -59,17 +54,25 @@ class _VerificationDetailScreenState extends State<VerificationDetailScreen> {
                     Text(
                       'Pensioner Information',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 16),
-                    _buildInfoRow('Name (Bangla):', widget.verification.pensionerName),
-                    _buildInfoRow('Name (English):', widget.verification.pensionerEn),
+                    _buildInfoRow(
+                      'Name (Bangla):',
+                      widget.verification.pensionerName,
+                    ),
+                    _buildInfoRow(
+                      'Name (English):',
+                      widget.verification.pensionerEn,
+                    ),
                     _buildInfoRow('NID:', widget.verification.nid),
                     _buildInfoRow('EPPO:', widget.verification.eppoNumber),
                     _buildInfoRow(
                       'Method:',
-                      widget.verification.method.replaceAll('_', ' ').toUpperCase(),
+                      widget.verification.method
+                          .replaceAll('_', ' ')
+                          .toUpperCase(),
                     ),
                   ],
                 ),
@@ -91,8 +94,8 @@ class _VerificationDetailScreenState extends State<VerificationDetailScreen> {
                     Text(
                       'Submission Details',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     _buildInfoRow(
@@ -101,7 +104,9 @@ class _VerificationDetailScreenState extends State<VerificationDetailScreen> {
                     ),
                     _buildInfoRow(
                       'Status:',
-                      widget.verification.status.replaceAll('_', ' ').toUpperCase(),
+                      widget.verification.status
+                          .replaceAll('_', ' ')
+                          .toUpperCase(),
                       statusColor: _getStatusColor(widget.verification.status),
                     ),
                     if (widget.verification.reviewedAt != null)
@@ -137,8 +142,8 @@ class _VerificationDetailScreenState extends State<VerificationDetailScreen> {
                       Text(
                         'Submitted Documents',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 16),
                       if (widget.verification.selfieUrl != null)
@@ -177,18 +182,20 @@ class _VerificationDetailScreenState extends State<VerificationDetailScreen> {
                       Text(
                         'Location Information',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 16),
                       _buildInfoRow(
                         'Latitude:',
-                        widget.verification.locationData?['latitude']?.toString() ??
+                        widget.verification.locationData?['latitude']
+                                ?.toString() ??
                             'N/A',
                       ),
                       _buildInfoRow(
                         'Longitude:',
-                        widget.verification.locationData?['longitude']?.toString() ??
+                        widget.verification.locationData?['longitude']
+                                ?.toString() ??
                             'N/A',
                       ),
                       _buildInfoRow(
@@ -217,8 +224,8 @@ class _VerificationDetailScreenState extends State<VerificationDetailScreen> {
                       Text(
                         'Admin Notes',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 12),
                       TextField(
@@ -250,8 +257,8 @@ class _VerificationDetailScreenState extends State<VerificationDetailScreen> {
                       Text(
                         'Admin Notes',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 12),
                       Container(
@@ -281,11 +288,7 @@ class _VerificationDetailScreenState extends State<VerificationDetailScreen> {
     );
   }
 
-  Widget _buildInfoRow(
-    String label,
-    String value, {
-    Color? statusColor,
-  }) {
+  Widget _buildInfoRow(String label, String value, {Color? statusColor}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -324,10 +327,7 @@ class _VerificationDetailScreenState extends State<VerificationDetailScreen> {
                   )
                 : Text(
                     value,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Colors.black87,
-                    ),
+                    style: const TextStyle(fontSize: 13, color: Colors.black87),
                   ),
           ),
         ],
@@ -410,7 +410,9 @@ class _VerificationDetailScreenState extends State<VerificationDetailScreen> {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
-            onPressed: _isSubmitting ? null : () => _approveVerification(context),
+            onPressed: _isSubmitting
+                ? null
+                : () => _approveVerification(context),
             icon: _isSubmitting
                 ? const SizedBox(
                     width: 20,
@@ -460,9 +462,7 @@ class _VerificationDetailScreenState extends State<VerificationDetailScreen> {
     setState(() => _isSubmitting = true);
 
     final adminProvider = context.read<AdminProvider>();
-    final success = await adminProvider.markUnderReview(
-      widget.verification.id,
-    );
+    final success = await adminProvider.markUnderReview(widget.verification.id);
 
     setState(() => _isSubmitting = false);
 
@@ -521,9 +521,7 @@ class _VerificationDetailScreenState extends State<VerificationDetailScreen> {
               onPressed: () async {
                 if (reasonController.text.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please provide a reason'),
-                    ),
+                    const SnackBar(content: Text('Please provide a reason')),
                   );
                   return;
                 }
@@ -531,9 +529,7 @@ class _VerificationDetailScreenState extends State<VerificationDetailScreen> {
                 Navigator.pop(context);
                 await _rejectVerification(context, reasonController.text);
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-              ),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
               child: const Text('Reject'),
             ),
           ],

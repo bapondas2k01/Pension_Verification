@@ -6,6 +6,7 @@ import 'verification_requests_screen.dart';
 import 'pensioners_list_screen.dart';
 import 'verification_statistics_screen.dart';
 import 'verification_detail_screen.dart';
+import 'admin_management_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -22,6 +23,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     VerificationRequestsScreen(),
     PensionersListScreen(),
     VerificationStatisticsScreen(),
+    AdminManagementScreen(),
   ];
 
   @override
@@ -55,10 +57,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   (Route<dynamic> route) => false,
                 );
               },
-              child: const Text(
-                'Logout',
-                style: TextStyle(color: Colors.red),
-              ),
+              child: const Text('Logout', style: TextStyle(color: Colors.red)),
             ),
           ],
         );
@@ -90,7 +89,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     Center(
                       child: Text(
                         adminProvider.currentAdmin?.name ?? 'Admin',
-                        style: const TextStyle(color: Colors.white, fontSize: 14),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
                       ),
                     ),
                     PopupMenuButton<String>(
@@ -100,18 +102,23 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                           _logout();
                         }
                       },
-                      itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                        const PopupMenuItem<String>(
-                          value: 'logout',
-                          child: Row(
-                            children: [
-                              Icon(Icons.logout, color: Colors.red, size: 20),
-                              SizedBox(width: 8),
-                              Text('Logout'),
-                            ],
-                          ),
-                        ),
-                      ],
+                      itemBuilder: (BuildContext context) =>
+                          <PopupMenuEntry<String>>[
+                            const PopupMenuItem<String>(
+                              value: 'logout',
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.logout,
+                                    color: Colors.red,
+                                    size: 20,
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text('Logout'),
+                                ],
+                              ),
+                            ),
+                          ],
                     ),
                   ],
                 ),
@@ -148,6 +155,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.bar_chart),
             label: 'Statistics',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.admin_panel_settings),
+            label: 'Admin',
           ),
         ],
       ),
@@ -283,7 +294,10 @@ class AdminHomeScreen extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: () {
                       if (context.mounted) {
-                        final dashboardState = context.findAncestorStateOfType<_AdminDashboardScreenState>();
+                        final dashboardState = context
+                            .findAncestorStateOfType<
+                              _AdminDashboardScreenState
+                            >();
                         dashboardState?._navigateToTab(1);
                       }
                     },
@@ -300,7 +314,10 @@ class AdminHomeScreen extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: () {
                       if (context.mounted) {
-                        final dashboardState = context.findAncestorStateOfType<_AdminDashboardScreenState>();
+                        final dashboardState = context
+                            .findAncestorStateOfType<
+                              _AdminDashboardScreenState
+                            >();
                         dashboardState?._navigateToTab(2);
                       }
                     },
@@ -340,7 +357,10 @@ class AdminHomeScreen extends StatelessWidget {
                   color: Colors.blue,
                   onTap: () {
                     if (context.mounted) {
-                      final dashboardState = context.findAncestorStateOfType<_AdminDashboardScreenState>();
+                      final dashboardState = context
+                          .findAncestorStateOfType<
+                            _AdminDashboardScreenState
+                          >();
                       dashboardState?._navigateToTab(1);
                     }
                   },
@@ -353,7 +373,10 @@ class AdminHomeScreen extends StatelessWidget {
                   color: Colors.purple,
                   onTap: () {
                     if (context.mounted) {
-                      final dashboardState = context.findAncestorStateOfType<_AdminDashboardScreenState>();
+                      final dashboardState = context
+                          .findAncestorStateOfType<
+                            _AdminDashboardScreenState
+                          >();
                       dashboardState?._navigateToTab(2);
                     }
                   },
@@ -366,7 +389,10 @@ class AdminHomeScreen extends StatelessWidget {
                   color: Colors.teal,
                   onTap: () {
                     if (context.mounted) {
-                      final dashboardState = context.findAncestorStateOfType<_AdminDashboardScreenState>();
+                      final dashboardState = context
+                          .findAncestorStateOfType<
+                            _AdminDashboardScreenState
+                          >();
                       dashboardState?._navigateToTab(3);
                     }
                   },
@@ -379,7 +405,10 @@ class AdminHomeScreen extends StatelessWidget {
                   color: Colors.orange,
                   onTap: () {
                     if (context.mounted) {
-                      final dashboardState = context.findAncestorStateOfType<_AdminDashboardScreenState>();
+                      final dashboardState = context
+                          .findAncestorStateOfType<
+                            _AdminDashboardScreenState
+                          >();
                       dashboardState?._navigateToTab(1);
                     }
                   },
@@ -407,7 +436,9 @@ class AdminHomeScreen extends StatelessWidget {
                   );
                 }
 
-                final verifications = adminProvider.pendingVerifications.take(5);
+                final verifications = adminProvider.pendingVerifications.take(
+                  5,
+                );
                 return ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
