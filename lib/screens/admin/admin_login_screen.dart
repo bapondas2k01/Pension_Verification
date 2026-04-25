@@ -72,11 +72,12 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
         );
       } else {
         // Get specific error message
-        final errorMessage = await AdminService.getAuthenticationErrorMessageByEmail(
-          email: email,
-          password: password,
-        );
-        
+        final errorMessage =
+            await AdminService.getAuthenticationErrorMessageByEmail(
+              email: email,
+              password: password,
+            );
+
         setState(() => _isLoading = false);
         _showError(errorMessage);
       }
@@ -283,7 +284,9 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                       decoration: BoxDecoration(
                         color: Colors.green.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.green.withOpacity(0.3)),
+                        border: Border.all(
+                          color: Colors.green.withOpacity(0.3),
+                        ),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
