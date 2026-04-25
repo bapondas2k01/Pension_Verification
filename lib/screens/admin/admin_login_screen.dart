@@ -106,11 +106,20 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
               color: AppTheme.primaryGreen,
               child: Row(
                 children: [
+<<<<<<< Updated upstream
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
                     child: const Icon(Icons.arrow_back, color: Colors.white),
                   ),
                   const SizedBox(width: 16),
+=======
+                  if (Navigator.canPop(context))
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: const Icon(Icons.arrow_back, color: Colors.white),
+                    ),
+                  if (Navigator.canPop(context)) const SizedBox(width: 16),
+>>>>>>> Stashed changes
                   const Text(
                     'Admin Login',
                     style: TextStyle(
